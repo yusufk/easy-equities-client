@@ -85,3 +85,21 @@ class AccountsClient(Client):
                 ).next_sibling.next_sibling.text.strip()
                 holding['shares'] = f"{whole_shares}{partial_shares}"
         return holdings
+
+    def login(self) -> None:
+        """
+        Authenticates with EasyEquities using credentials from a .env file.
+        The .env file should contain EASYEQUITIES_USERNAME and EASYEQUITIES_PASSWORD.
+        """
+        from dotenv import load_dotenv
+        import os
+        load_dotenv()
+        username = os.getenv("EASYEQUITIES_USERNAME")
+        password = os.getenv("EASYEQUITIES_PASSWORD")
+        if not username or not password:
+            raise ValueError("Username or password not set in the .env file.")
+        login_url = "https://portfolio-overview.apps.easyequities.io/"
+        payload = {"username": username, "password": password}
+        response = self.session.post(login_url, data=payload)
+        response.raise_for_status()
+        assert "My Investments" in str(response.content), "Login failed"
