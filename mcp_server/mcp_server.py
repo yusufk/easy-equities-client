@@ -1,12 +1,14 @@
 # An MCP server that wraps the easy-equities functionality
-from mcp.server.fastmcp import FastMCP
-from easy_equities_client.clients import EasyEquitiesClient
 import os
-from dotenv import load_dotenv
-import logging
 import sys
 
+# Add the project root to Python path BEFORE importing easy_equities_client
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from mcp.server.fastmcp import FastMCP
+from easy_equities_client.clients import EasyEquitiesClient
+from dotenv import load_dotenv
+import logging
 
 # Load credentials from .env
 load_dotenv()
@@ -25,10 +27,9 @@ mcp = FastMCP("EasyEquities")
 logging.basicConfig(level=logging.DEBUG)
 
 
-@mcp.tool()
+@mcp.tool(description="List all Easy Equities accounts with correct attribute names")
 def list_accounts() -> list:
     logging.info("list_accounts called")
-    """List all Easy Equities accounts with correct attribute names"""
     accounts = client.accounts.list()
     return [
         {
@@ -40,10 +41,9 @@ def list_accounts() -> list:
     ]
 
 
-@mcp.tool()
+@mcp.tool(description="Get valuations for a specific Easy Equities account")
 def get_account_valuations(account_id: str) -> dict:
     logging.info(f"get_account_valuations called with account_id={account_id}")
-    """Get valuations for a specific Easy Equities account"""
     try:
         return client.accounts.valuations(account_id)
     except Exception as e:
@@ -51,10 +51,9 @@ def get_account_valuations(account_id: str) -> dict:
         return {"error": str(e)}
 
 
-@mcp.tool()
+@mcp.tool(description="Get transaction history for a specific Easy Equities account")
 def get_account_transactions(account_id: str) -> dict:
     logging.info(f"get_account_transactions called with account_id={account_id}")
-    """Get transaction history for a specific Easy Equities account"""
     try:
         return client.accounts.transactions(account_id)
     except Exception as e:
@@ -62,10 +61,9 @@ def get_account_transactions(account_id: str) -> dict:
         return {"error": str(e)}
 
 
-@mcp.tool()
+@mcp.tool(description="Get current holdings for a specific Easy Equities account")
 def get_account_holdings(account_id: str, include_shares: bool = False) -> dict:
     logging.info(f"get_account_holdings called with account_id={account_id}, include_shares={include_shares}")
-    """Get current holdings for a specific Easy Equities account"""
     try:
         return client.accounts.holdings(account_id, include_shares)
     except Exception as e:
@@ -73,10 +71,9 @@ def get_account_holdings(account_id: str, include_shares: bool = False) -> dict:
         return {"error": str(e)}
 
 
-@mcp.tool()
+@mcp.tool(description="Get historical prices for an instrument. Available periods: ONE_DAY, ONE_WEEK, ONE_MONTH, THREE_MONTHS, SIX_MONTHS, ONE_YEAR, TWO_YEARS, FIVE_YEARS")
 def get_instrument_historical_prices(contract_code: str, period: str = "ONE_MONTH") -> dict:
     logging.info(f"get_instrument_historical_prices called with contract_code={contract_code}, period={period}")
-    """Get historical prices for an instrument. Available periods: ONE_DAY, ONE_WEEK, ONE_MONTH, THREE_MONTHS, SIX_MONTHS, ONE_YEAR, TWO_YEARS, FIVE_YEARS"""
     try:
         from easy_equities_client.instruments.types import Period
         # Convert string to enum, handling case variations
