@@ -1,4 +1,4 @@
-# Easy Equities and Satrix Python Client
+# Easy Equities and Satrix Python Client, with MCP server!
 
 Unofficial Python client for [Easy Equities](easyequities.io/) and 
 [Satrix](satrix.co.za/). **Intended for personal use.**
@@ -182,3 +182,117 @@ Run a script to show your holdings and their total profits/losses, e.g.
 ## Contributing
 
 See [Contributing](./CONTRIBUTING.md)
+
+## MCP Server
+
+This fork adds an [MCP server](https://github.com/multimodal-cognition/mcp) that wraps the Easy Equities client, exposing its functionality as tools for LLM agents such as [Claude](https://claude.ai/) and the [`q` CLI](https://github.com/multimodal-cognition/q).
+
+### Running the MCP Server
+
+First, ensure you have your Easy Equities credentials in a `.env` file:
+
+```
+EASYEQUITIES_USERNAME=your_username
+EASYEQUITIES_PASSWORD=your_password
+```
+
+Then start the MCP server:
+
+```sh
+python mcp_server/mcp_server.py
+```
+
+Or, if you use a task runner or the `q` CLI, you can define it like this:
+
+```json
+"mcp_server": {
+  "command": "python",
+  "args": [
+    "~/easy-equities-client/mcp_server/mcp_server.py"
+  ],
+  "cwd": "~/easy-equities-client"
+}
+```
+
+### Using with Claude
+
+You can connect Claude to your running MCP server and ask questions like:
+
+- "List all my Easy Equities accounts."
+- "Show the holdings for account 12345."
+- "Get the historical prices for EQU.ZA.SYGJP over the last month."
+
+Claude will call the appropriate MCP tools and return the results.
+
+### Using with the `q` CLI
+
+To use the MCP server with the [`q` CLI](https://github.com/multimodal-cognition/q), add the following entry to your `~/.aws/amazonq/mcp.json` file:
+
+```json
+"mcp_server": {
+  "command": "python",
+  "args": [
+    "/Users/yusuf/Development/easy-equities-client/mcp_server/mcp_server.py"
+  ],
+  "cwd": "/Users/yusuf/Development/easy-equities-client"
+}
+```
+
+Once this is configured, simply launch `q` and interact with your Easy Equities data in natural language, like:
+
+```sh
+~/ $ q                                                                                                                                                                                     [10:33:18]
+✓ home_assistant loaded in 2.76 s
+✓ playwright loaded in 3.83 s
+✓ mcp_server loaded in 4.42 s
+⚠ 3 of 4 mcp servers initialized. Servers still loading:
+ - context_7
+
+    ⢠⣶⣶⣦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣤⣶⣿⣿⣿⣶⣦⡀⠀
+ ⠀⠀⠀⣾⡿⢻⣿⡆⠀⠀⠀⢀⣄⡄⢀⣠⣤⣤⡀⢀⣠⣤⣤⡀⠀⠀⢀⣠⣤⣤⣤⣄⠀⠀⢀⣤⣤⣤⣤⣤⣤⡀⠀⠀⣀⣤⣤⣤⣀⠀⠀⠀⢠⣤⡀⣀⣤⣤⣄⡀⠀⠀⠀⠀⠀⠀⢠⣿⣿⠋⠀⠀⠀⠙⣿⣿⡆
+ ⠀⠀⣼⣿⠇⠀⣿⣿⡄⠀⠀⢸⣿⣿⠛⠉⠻⣿⣿⠛⠉⠛⣿⣿⠀⠀⠘⠛⠉⠉⠻⣿⣧⠀⠈⠛⠛⠛⣻⣿⡿⠀⢀⣾⣿⠛⠉⠻⣿⣷⡀⠀⢸⣿⡟⠛⠉⢻⣿⣷⠀⠀⠀⠀⠀⠀⣼⣿⡏⠀⠀⠀⠀⠀⢸⣿⣿
+ ⠀⢰⣿⣿⣤⣤⣼⣿⣷⠀⠀⢸⣿⣿⠀⠀⠀⣿⣿⠀⠀⠀⣿⣿⠀⠀⢀⣴⣶⣶⣶⣿⣿⠀⠀⠀⣠⣾⡿⠋⠀⠀⢸⣿⣿⠀⠀⠀⣿⣿⡇⠀⢸⣿⡇⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⢹⣿⣇⠀⠀⠀⠀⠀⢸⣿⡿
+ ⢀⣿⣿⠋⠉⠉⠉⢻⣿⣇⠀⢸⣿⣿⠀⠀⠀⣿⣿⠀⠀⠀⣿⣿⠀⠀⣿⣿⡀⠀⣠⣿⣿⠀⢀⣴⣿⣋⣀⣀⣀⡀⠘⣿⣿⣄⣀⣠⣿⣿⠃⠀⢸⣿⡇⠀⠀⢸⣿⣿⠀⠀⠀⠀⠀⠀⠈⢿⣿⣦⣀⣀⣀⣴⣿⡿⠃
+ ⠚⠛⠋⠀⠀⠀⠀⠘⠛⠛⠀⠘⠛⠛⠀⠀⠀⠛⠛⠀⠀⠀⠛⠛⠀⠀⠙⠻⠿⠟⠋⠛⠛⠀⠘⠛⠛⠛⠛⠛⠛⠃⠀⠈⠛⠿⠿⠿⠛⠁⠀⠀⠘⠛⠃⠀⠀⠘⠛⠛⠀⠀⠀⠀⠀⠀⠀⠀⠙⠛⠿⢿⣿⣿⣋⠀⠀
+ ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠛⠿⢿⡧
+
+╭─────────────────────────────── Did you know? ────────────────────────────────╮
+│                                                                              │
+│   Q can use tools without asking for confirmation every time. Give /tools    │
+│                                 trust a try                                  │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+/help all commands  •  ctrl + j new lines  •  ctrl + s fuzzy search
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🤖 You are chatting with claude-4-sonnet
+
+> Give me a list of my easy equities accounts
+I'll get a list of your Easy Equities accounts for you.
+
+
+🛠️  Using tool: list_accounts from mcp server mcp_server
+ ⋮
+ ● Running list_accounts with the param:
+ ⋮  {
+ ⋮    "arguments": {},
+ ⋮    "name": "list_accounts"
+ ⋮  }
+Allow this action? Use 't' to trust (always allow) this tool for the session. [y/n/t]:
+
+> y
+
+ ⋮
+ ● Completed in 1.264s
+
+Here are your Easy Equities accounts:
+
+• Demo ZAR (ID: 1979112) - Demo account in ZAR
+• Demo USD (ID: 1979115) - Demo account in USD
+
+You have 2 accounts total, demo accounts across different currencies (ZAR and USD).
+```
+
+---
+
+See [mcp_server/mcp_server.py](./mcp_server/mcp_server.py) for available tool methods and their descriptions.
