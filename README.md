@@ -10,9 +10,37 @@ Supports Python 3.6+.
 
 ## Installation
 
+You can install the library from PyPI:
+
 ```
 pip install easy-equities-client
 ```
+
+**However, if you prefer to manage credentials and configuration yourself (recommended for development or advanced use), you can use the source directly:**
+
+1. Clone the repository:
+
+   ```sh
+   git clone https://github.com/yourusername/easy-equities-client.git
+   cd easy-equities-client
+   ```
+
+2. (Optional) Create a virtual environment and activate it:
+
+   ```sh
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+3. Install dependencies:
+
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+4. Use the code directly from the cloned folder, or run scripts and the MCP server as described below.
+
+---
 
 ## Features
 
@@ -191,7 +219,7 @@ This fork adds an [MCP server](https://github.com/multimodal-cognition/mcp) that
 
 Below is a demo of using the MCP server with the `q` CLI:
 
-![q-mcp-demo](./examples/q-mcp-demo.gif)
+![q-mcp-demo](examples/easyequitiesmcp.gif)
 
 ### Running the MCP Server
 
