@@ -103,3 +103,59 @@ class AccountsClient(Client):
         response = self.session.post(login_url, data=payload)
         response.raise_for_status()
         assert "My Investments" in str(response.content), "Login failed"
+
+    def get_statement_by_id(self, account_id: str, statement_id: str, save_path: str = None) -> dict:
+        """
+        Get a specific statement by ID for extended transaction history.
+        Returns PDF content that can be saved or parsed.
+        
+        :param account_id: String account ID
+        :param statement_id: Statement ID to fetch
+        :param save_path: Optional path to save the PDF file
+        """
+        self._switch_account(account_id)
+        # Extract account number from account info if needed
+        account_number = f"EE565852-{account_id}"  # Format observed from curl
+        import time
+        timestamp = int(time.time() * 1000)
+        
+        url = f"{self._url(constants.PLATFORM_STATEMENT_BY_ID_PATH)}/{statement_id}"
+        params = {
+            'accountNumber': account_number,
+            '_': timestamp
+        }
+        
+        response = self.session.get(url, params=params)
+        response.raise_for_status()
+        
+        if save_path:
+            with open(save_path, 'wb') as f:
+                f.write(response.content)
+        
+        return {
+            "statement_id": statement_id,
+            "content_type": response.headers.get('content-type'),
+            "content_length": len(response.content),
+            "saved_to": save_path if save_path else None,
+            "pdf_content": response.content if not save_path else None
+        }
+
+    def list_statements(self, account_id: str) -> list:
+        """
+        List available statements for an account by parsing the statements page.
+        
+        :param account_id: String account ID
+        """
+        self._switch_account(account_id)
+        response = self.session.get(self._url(constants.PLATFORM_STATEMENTS_LIST_PATH))
+        response.raise_for_status()
+        
+        # Parse statement IDs from the page content
+        import re
+        content = response.text
+        statement_matches = re.findall(r'/Statement/GetStatementById/(\d+)', content)
+        
+        # Remove duplicates and sort (newest first, assuming higher IDs are newer)
+        statement_ids = sorted(list(set(statement_matches)), key=int, reverse=True)
+        
+        return [{"statement_id": sid} for sid in statement_ids]

@@ -125,5 +125,36 @@ def get_account_summary() -> dict:
         return {"error": str(e)}
 
 
+@mcp.tool(description="List available statements for an account to get extended transaction history")
+def list_account_statements(account_id: str) -> dict:
+    """List available statements for an account"""
+    logging.info(f"list_account_statements called with account_id={account_id}")
+    try:
+        statements = client.accounts.list_statements(account_id)
+        return {
+            "account_id": account_id,
+            "total_statements": len(statements),
+            "statements": statements[:20]  # Return first 20 for manageable output
+        }
+    except Exception as e:
+        logging.error(f"Error listing statements for account {account_id}: {str(e)}")
+        return {"error": str(e)}
+
+
+@mcp.tool(description="Download and save a statement PDF by ID for extended transaction history")
+def download_account_statement(account_id: str, statement_id: str, save_path: str = None) -> dict:
+    """Download a specific statement PDF by ID"""
+    logging.info(f"download_account_statement called with account_id={account_id}, statement_id={statement_id}")
+    try:
+        if not save_path:
+            save_path = f"/tmp/statement_{account_id}_{statement_id}.pdf"
+        
+        result = client.accounts.get_statement_by_id(account_id, statement_id, save_path)
+        return result
+    except Exception as e:
+        logging.error(f"Error downloading statement {statement_id} for account {account_id}: {str(e)}")
+        return {"error": str(e)}
+
+
 if __name__ == "__main__":
     mcp.run()

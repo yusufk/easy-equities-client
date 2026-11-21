@@ -142,3 +142,4 @@ cython_debug/
 
 # Poetry
 poetry.lock
+.DS_Store
